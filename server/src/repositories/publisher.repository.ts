@@ -1,22 +1,20 @@
 import { inject } from '@loopback/core';
 import { DataObject, DefaultCrudRepository, Filter } from '@loopback/repository';
 import { BookStoreDataSource } from '../datasources';
-import { Book, BookRelations } from '../models';
+import { Publisher, PublisherRelations } from '../models';
 
-export class BookRepository extends DefaultCrudRepository<
-  Book,
-  typeof Book.prototype.id,
-  BookRelations
+export class PublisherRepository extends DefaultCrudRepository<
+  Publisher,
+  typeof Publisher.prototype.id,
+  PublisherRelations
 > {
-
   constructor(
     @inject('datasources.bookStore') dataSource: BookStoreDataSource,
   ) {
-    super(Book, dataSource);
+    super(Publisher, dataSource);
   }
 
-
-  async findOrCreate(filter: Filter<Book>, data: DataObject<Book>): Promise<Book> {
+  async findOrCreate(filter: Filter<Publisher>, data: DataObject<Publisher>): Promise<Publisher> {
 
     const existing = await this.findOne(filter);
     if (existing) return existing;
