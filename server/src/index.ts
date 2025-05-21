@@ -1,6 +1,8 @@
 import {ApplicationConfig, BookStoreApplication} from './application';
 
 export * from './application';
+import dotenv from "dotenv";
+dotenv.config();
 
 export async function main(options: ApplicationConfig = {}) {
   const app = new BookStoreApplication(options);
