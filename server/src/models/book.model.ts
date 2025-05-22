@@ -42,6 +42,11 @@ export class Book extends Entity {
   @belongsTo(() => Publisher)
   publisherId: number;
 
+  @property({
+    type: 'string',
+  })
+  src: string;
+
   constructor(data?: Partial<Book>) {
     super(data);
   }
