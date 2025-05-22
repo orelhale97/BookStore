@@ -24,18 +24,21 @@ export function BookList() {
       <div className='BoolList' key={"BoolList"}>
          <Search searchHandler={searchBooks} title='Test Search'></Search>
 
-         {books && books.map((book, index) =>
-            <div className='book' key={"book" + index}>
+         <div className='booksContainer'>
+            {books && books.map((book, index) =>
+               <div className='book' key={"book" + index}>
 
-               <div className='img-wrap'>
-                  <img src={`${SERVER_URL}${book.src}`} />
+                  <div className='img-wrap  logo-spin'>
+                     <img src={`${SERVER_URL}${book.src}`} />
+                  </div>
+
+                  <div className="book-details">
+                     <span className='name text-ellipsis-2'>{book.name + " " + book.name}</span>
+                     <span className='author'>{book.author.name + " " + book.author.name}</span>
+                  </div>
                </div>
-
-               <div className="book-details">{book.name}</div>
-
-            </div>
-         )}
-
+            )}
+         </div>
       </div>
    )
 }
