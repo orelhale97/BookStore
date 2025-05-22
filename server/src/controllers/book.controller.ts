@@ -1,6 +1,7 @@
 import {
   Count,
   Filter,
+  FilterBuilder,
   FilterExcludingWhere,
   repository,
 } from '@loopback/repository';
@@ -75,8 +76,40 @@ export class BookController {
     },
   })
   async find(
-    @param.filter(Book) filter?: Filter<Book>,
+    @param.query.string('search') search?: string,
   ): Promise<Book[]> {
+    const filter = new FilterBuilder<Book>().include(['author', 'publisher']);
+
+    if (search) {
+      search = search.trim();
+      filter.where({ name: { like: `%${search}%` } });
+      // return (await this.searchBookOrAuther(search))
+    }
+
+    return this.bookRepository.find(filter.build());
+  }
+
+
+  async searchBookOrAuther(search: string): Promise<Book[]> {
+    const query = `
+      SELECT 
+        b.id
+      FROM book b
+      JOIN author a ON b.authorId = a.id
+      WHERE b.name LIKE '%${search}%' OR a.name LIKE '%${search}%'
+    `;
+    const result = await this.bookRepository.dataSource.execute(query);
+    const bookIds = result.map((item: any) => item.id);
+
+    if (!bookIds.length) {
+      return [];
+    }
+
+    const filter = new FilterBuilder<Book>()
+      .include(['author', 'publisher'])
+      .where({ id: { inq: bookIds } })
+      .build();
+
     return this.bookRepository.find(filter);
   }
 
