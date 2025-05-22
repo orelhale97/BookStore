@@ -27,7 +27,8 @@ export class BookStoreApplication extends BootMixin(
     this.sequence(MySequence);
 
     // Set up default home page
-    this.static('/', path.join(__dirname, '../public'));
+    this.static('/', path.join(__dirname, '../assets'));
+    this.static('/uploads', path.join(__dirname, '../assets/uploads'));
 
     // Customize @loopback/rest-explorer configuration here
     this.configure(RestExplorerBindings.COMPONENT).to({
