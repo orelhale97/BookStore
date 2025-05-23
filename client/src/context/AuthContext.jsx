@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import axios from "axios";
 import { jwtDecode } from "jwt-decode"
+import { useNavigate } from 'react-router-dom';
 
 
 const AuthContext = createContext();
@@ -12,6 +12,8 @@ export const useAuth = () => useContext(AuthContext);
 export default function AuthProvider({ children }) {
 
    const [user, setUser] = useState(null);
+   const [showPopup, setShowPopup] = useState(null);
+   const navigate = useNavigate();
 
    useEffect(() => {
       getUserDetailsFromToken()
@@ -25,6 +27,8 @@ export default function AuthProvider({ children }) {
 
       localStorage.removeItem("token");
       setUser(null);
+
+      navigate("/")
    };
 
 
@@ -42,21 +46,16 @@ export default function AuthProvider({ children }) {
       }
    }
 
-   async function login(email, password) {
-      try {
-         const request = await axios.post("./login", { email, password });
-         const { token } = request.data;
-         localStorage.token = token;
-         getUserDetailsFromToken()
-      } catch (error) {
-         console.log("Login Failed ===== ", error);
-         alert("Login Failed")
-      }
+   function setToken(token) {
+      localStorage.token = token;
+      getUserDetailsFromToken();
+      navigate("/");
+      setShowPopup(null);
    }
 
 
    return (
-      <AuthContext.Provider value={{ login, logout, user }}>
+      <AuthContext.Provider value={{ setToken, logout, user, showPopup, setShowPopup }}>
          {children}
       </AuthContext.Provider>
    )

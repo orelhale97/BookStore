@@ -5,10 +5,7 @@ export default function Template() {
 
 
    return (
-      <div
-         className='Template'
-      // key={'Template'}
-      >
+      <div className='Template'>
 
       </div>
    )

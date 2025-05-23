@@ -6,11 +6,11 @@ import Layout from './layout/Layout/Layout'
 function App() {
 
    return (
-      <AuthProvider>
-         <BrowserRouter>
+      <BrowserRouter>
+         <AuthProvider>
             <Layout />
-         </BrowserRouter>
-      </AuthProvider>
+         </AuthProvider>
+      </BrowserRouter>
    )
 }
 

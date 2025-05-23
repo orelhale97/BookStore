@@ -1,5 +1,5 @@
 import Search from '../../components/Search/Search';
-import { fetchBooks, SERVER_URL } from '../../services/Books.service';
+import { fetchBooks, SERVER_URL } from '../../services/user.service';
 import './BookList.scss'
 
 import { useEffect, useState } from 'react'

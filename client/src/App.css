@@ -42,6 +42,9 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+.text-error {
+  color: red;
+}
 
 @keyframes logo-spin {
   from {

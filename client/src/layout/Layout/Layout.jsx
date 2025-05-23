@@ -4,10 +4,13 @@ import Header from '../Header/Header'
 import HomePage from '../HomePage/HomePage'
 import Sidebar from '../Sidebar/Sidebar'
 import { Navigate, Route, Router, Routes } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext'
+import Popup from '../../components/Popup/Popup'
 
 
 export default function Layout() {
 
+   const { showPopup, setShowPopup } = useAuth()
 
    return (
       <div className='Layout' key={'Layout'}>
@@ -23,6 +26,8 @@ export default function Layout() {
                </Routes>
             </div>
          </div>
+
+         {showPopup && <Popup onClose={() => setShowPopup(null)}>{showPopup}</Popup>}
       </div>
    )
 }
