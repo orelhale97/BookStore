@@ -3,11 +3,10 @@ import './Header.scss'
 
 export default function Header() {
 
-
    return (
-      <div className='Header'>
-         Header
-      </div>
+      <header className="Header">
+         <div className="logo">📚 BookNest</div>
+         <button className="login-button" onClick={() => { }}>login</button>
+      </header>
    )
 }
-

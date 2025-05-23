@@ -1,1 +1,36 @@
-.Sidebar {}
+.Sidebar {
+    max-width: 500px;
+    min-width: 250px;
+    background-color: #f4f4f4;
+    padding: 10px;
+    height: 100vh;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    button {
+        display: block;
+        width: 100%;
+        padding: 10px 12px;
+        margin-bottom: 10px;
+        background: none;
+        border: none;
+        text-align: left;
+        cursor: pointer;
+        font-size: 16px;
+        border-radius: 4px;
+        transition: background 0.2s;
+        text-align: left;
+    }
+
+    button:hover {
+        background-color: #ddd;
+        background: linear-gradient(to right, #ddd, #ededed);
+    }
+
+    .active {
+        background: linear-gradient(to right, #4e54c8, #8f94fb);
+        color: white;
+    }
+}

@@ -1,1 +1,9 @@
-.Layout {}
+.Layout {
+   .app-container {
+      display: flex;
+
+      .app-main {
+         width: 100%;
+      }
+   }
+}
