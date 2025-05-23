@@ -1,7 +1,7 @@
 import './Layout.scss'
 
 import Header from '../Header/Header'
-import HomePage from '../HomePage/HomePage'
+import Main from '../Main/Main'
 import Sidebar from '../Sidebar/Sidebar'
 import { Navigate, Route, Router, Routes } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
@@ -21,7 +21,7 @@ export default function Layout() {
             <div className='app-main'>
                <Routes>
                   <Route path="/" element={<Navigate to="/books" replace />} />
-                  <Route path="books" element={<HomePage />} />
+                  <Route path="books" element={<Main />} />
                   <Route path="*" element={<h1 style={{ color: "red", textAlign: "center", marginTop: "200px" }}>Page not found</h1>} />
                </Routes>
             </div>

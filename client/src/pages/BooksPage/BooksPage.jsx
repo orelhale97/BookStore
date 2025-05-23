@@ -1,12 +1,12 @@
 import Search from '../../components/Search/Search';
 import { fetchBooks, SERVER_URL } from '../../services/user.service';
-import './BookList.scss'
+import './BooksPage.scss'
 
 import { useEffect, useState } from 'react'
 
 
 
-export default function BookList() {
+export default function BooksPage() {
    const [books, setBooks] = useState();
 
    useEffect(() => {
