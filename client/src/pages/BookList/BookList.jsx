@@ -1,4 +1,4 @@
-import { Search } from '../../components/Search/Search';
+import Search from '../../components/Search/Search';
 import { fetchBooks, SERVER_URL } from '../../services/Books.service';
 import './BookList.scss'
 
@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
 
 
 
-export function BookList() {
+export default function BookList() {
    const [books, setBooks] = useState();
 
    useEffect(() => {
@@ -33,8 +33,8 @@ export function BookList() {
                   </div>
 
                   <div className="book-details">
-                     <span className='name text-ellipsis-2'>{book.name + " " + book.name}</span>
-                     <span className='author'>{book.author.name + " " + book.author.name}</span>
+                     <span className='name text-ellipsis-2'>{book.name}</span>
+                     <span className='author'>{book.author.name}</span>
                   </div>
                </div>
             )}

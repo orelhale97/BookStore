@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import debounce from 'lodash.debounce';
 
 
-export function Search({ searchHandler, title = "Search ..." }) {
+export default function Search({ searchHandler, title = "Search ..." }) {
    const [searchStr, setSearchStr] = useState("");
 
    const debouncedSearch = useRef(debounce((value) => {

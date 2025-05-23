@@ -1,16 +1,9 @@
-
-
-
-
-
-
-
-import { BookList } from '../BookList/BookList'
+import BookList from '../../pages/BookList/BookList'
 import './HomePage.scss'
 import { useEffect, useState } from 'react'
 
 
-export function HomePage() {
+export default function HomePage() {
 
     // const [temp, setTemp] = useState();
 
@@ -18,7 +11,7 @@ export function HomePage() {
 
     return (
         <div className='HomePage'>
-            <BookList></BookList>
+            <BookList />
         </div>
     )
 }

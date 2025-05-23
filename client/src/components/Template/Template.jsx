@@ -1,7 +1,7 @@
-import './Search.scss'
+import './Template.scss'
 
 
-export function Template() {
+export default function Template() {
 
 
    return (
