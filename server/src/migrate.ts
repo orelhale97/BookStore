@@ -1,5 +1,5 @@
 import { BookStoreApplication } from './application';
-import { AuthorRepository, BookRepository, PublisherRepository } from './repositories';
+import { AuthorRepository, BookRepository, PublisherRepository, RoleRepository, UserRepository } from './repositories';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
@@ -12,18 +12,43 @@ export async function migrate(args: string[]) {
   await app.boot();
   await app.migrateSchema({ existingSchema });
 
-  await creatingFakeBooks(app);
+  const isBookInclude = args.includes('book');
+  const isUserInclude = args.includes('user');
+
+  if (isBookInclude) {
+    console.log("Start to run creatingFakeBooks");
+    await creatingFakeBooks(app);
+  }
+
+  if (isUserInclude) {
+    console.log("Start to run creatingRoleAndUser");
+    await creatingRoleAndUser(app);
+  }
+
 
   process.exit(0);
 }
 
-// async function creatingFakeBooks(app: BookStoreApplication) {
-//   const roleRepository = await app.getRepository(RoleRepository);
-//   const userRepository = await app.getRepository(UserRepository);
+async function creatingRoleAndUser(app: BookStoreApplication) {
+  const roleRepository = await app.getRepository(RoleRepository);
+  const userRepository = await app.getRepository(UserRepository);
 
-//   const adminRoleId = await roleRepository.findOrCreate({ where: { name: 'admin' } }, { name: "admin" });
-//   await roleRepository.findOrCreate({ where: { name: 'user' } }, { name: "user" });
-// }
+
+  const adminRoleId = await roleRepository.findOrCreate({ where: { name: 'admin' } }, { name: "admin" });
+  const userRoleId = await roleRepository.findOrCreate({ where: { name: 'user' } }, { name: "user" });
+
+  console.log("Roles =", { adminRoleId, userRoleId });
+
+  if (!adminRoleId) {
+    console.error("Admin role not created");
+  }
+
+  if (process.env.ADMIN && adminRoleId) {
+    const adminObject = JSON.parse(process.env.ADMIN);
+    const admin = await userRepository.findOrCreate({ where: { name: "admin" } }, { ...adminObject, roleId: adminRoleId.id });
+    console.log("admin =", admin);
+  }
+}
 
 migrate(process.argv).catch(err => {
   console.error('Cannot migrate database schema', err);

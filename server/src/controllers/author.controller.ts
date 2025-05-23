@@ -18,13 +18,20 @@ import {
 } from '@loopback/rest';
 import { Author } from '../models';
 import { AuthorRepository } from '../repositories';
+import { authorize } from '@loopback/authorization';
+import { authenticate } from '@loopback/authentication';
 
+
+@authenticate('jwt')
 export class AuthorController {
+
   constructor(
     @repository(AuthorRepository)
     public authorRepository: AuthorRepository,
   ) { }
 
+
+  @authorize({ allowedRoles: ['admin'] })
   @post('/authors')
   @response(200, {
     description: 'Author model instance',
@@ -66,6 +73,7 @@ export class AuthorController {
     return this.authorRepository.find(filter);
   }
 
+
   @get('/authors/{id}')
   @response(200, {
     description: 'Author model instance',
@@ -83,6 +91,7 @@ export class AuthorController {
   }
 
 
+  @authorize({ allowedRoles: ['admin'] })
   @put('/authors/{id}')
   @response(204, {
     description: 'Author PUT success',
@@ -94,6 +103,8 @@ export class AuthorController {
     await this.authorRepository.replaceById(id, author);
   }
 
+
+  @authorize({ allowedRoles: ['admin'] })
   @del('/authors/{id}')
   @response(204, {
     description: 'Author DELETE success',

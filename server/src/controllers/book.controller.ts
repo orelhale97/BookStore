@@ -19,6 +19,8 @@ import {
 } from '@loopback/rest';
 import { Book } from '../models';
 import { AuthorRepository, BookRepository, PublisherRepository } from '../repositories';
+import { authorize } from '@loopback/authorization';
+import { authenticate } from '@loopback/authentication';
 
 export class BookController {
   constructor(
@@ -27,6 +29,9 @@ export class BookController {
     @repository(PublisherRepository) public publisherRepository: PublisherRepository,
   ) { }
 
+
+  @authenticate('jwt')
+  @authorize({ allowedRoles: ['admin'] })
   @post('/books')
   @response(200, {
     description: 'Book model instance',
@@ -90,28 +95,28 @@ export class BookController {
   }
 
 
-  async searchBookOrAuther(search: string): Promise<Book[]> {
-    const query = `
-      SELECT 
-        b.id
-      FROM book b
-      JOIN author a ON b.authorId = a.id
-      WHERE b.name LIKE '%${search}%' OR a.name LIKE '%${search}%'
-    `;
-    const result = await this.bookRepository.dataSource.execute(query);
-    const bookIds = result.map((item: any) => item.id);
+  // async searchBookOrAuther(search: string): Promise<Book[]> {
+  //   const query = `
+  //     SELECT 
+  //       b.id
+  //     FROM book b
+  //     JOIN author a ON b.authorId = a.id
+  //     WHERE b.name LIKE '%${search}%' OR a.name LIKE '%${search}%'
+  //   `;
+  //   const result = await this.bookRepository.dataSource.execute(query);
+  //   const bookIds = result.map((item: any) => item.id);
 
-    if (!bookIds.length) {
-      return [];
-    }
+  //   if (!bookIds.length) {
+  //     return [];
+  //   }
 
-    const filter = new FilterBuilder<Book>()
-      .include(['author', 'publisher'])
-      .where({ id: { inq: bookIds } })
-      .build();
+  //   const filter = new FilterBuilder<Book>()
+  //     .include(['author', 'publisher'])
+  //     .where({ id: { inq: bookIds } })
+  //     .build();
 
-    return this.bookRepository.find(filter);
-  }
+  //   return this.bookRepository.find(filter);
+  // }
 
 
   @get('/books/{id}')
@@ -131,6 +136,9 @@ export class BookController {
   }
 
 
+
+  @authenticate('jwt')
+  @authorize({ allowedRoles: ['admin'] })
   @put('/books/{id}')
   @response(204, {
     description: 'Book PUT success',
@@ -142,6 +150,9 @@ export class BookController {
     await this.bookRepository.replaceById(id, book);
   }
 
+
+  @authenticate('jwt')
+  @authorize({ allowedRoles: ['admin'] })
   @del('/books/{id}')
   @response(204, {
     description: 'Book DELETE success',

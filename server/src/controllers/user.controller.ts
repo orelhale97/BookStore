@@ -19,7 +19,12 @@ import {
 } from '@loopback/rest';
 import { User } from '../models';
 import { UserRepository } from '../repositories';
+import { authorize } from '@loopback/authorization';
+import { authenticate } from '@loopback/authentication';
 
+
+@authenticate('jwt')
+@authorize({ allowedRoles: ['admin'] })
 export class UserController {
   constructor(
     @repository(UserRepository)
@@ -27,7 +32,6 @@ export class UserController {
   ) { }
 
 
-  // @authorize({ allowedRoles: ['admin'] })
   @get('/users')
   @response(200, {
     description: 'Array of User model instances',
@@ -46,7 +50,7 @@ export class UserController {
     return this.userRepository.find(filter);
   }
 
-  // @authorize({ allowedRoles: ['admin'] })
+
   @put('/users/{id}')
   @response(204, {
     description: 'User PUT success',
