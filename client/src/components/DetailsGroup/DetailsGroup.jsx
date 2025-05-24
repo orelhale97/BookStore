@@ -1,13 +1,16 @@
 import "./DetailsGroup.scss";
 import { useEffect, useState, useRef } from "react";
 import {
+  createBook,
   fetchAuthors,
   fetchPublishers,
   updateBook,
   uploadBookImage,
 } from "../../services/admin.service";
 
-export default function DetailsGroup({ object, isAdmin, onUpdate }) {
+import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
+
+export default function DetailsGroup({ object, isAdmin, onUpdate, mode = "edit", }) {
   const [formData, setFormData] = useState({
     name: "",
     authorId: "",
@@ -18,16 +21,18 @@ export default function DetailsGroup({ object, isAdmin, onUpdate }) {
   const [publishers, setPublishers] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [errors, setErrors] = useState({});
+
   const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (object) {
       console.log("Initializing form data with object:", object);
       setFormData({
-        name: object.name || "",
-        authorId: object.author?.id || "",
-        publisherId: object.publisher?.id || "",
-        src: object.src || "",
+        name: object?.name || "",
+        authorId: object?.author?.id || "",
+        publisherId: object?.publisher?.id || "",
+        src: object?.src || "",
       });
     }
   }, [object]);
@@ -40,6 +45,24 @@ export default function DetailsGroup({ object, isAdmin, onUpdate }) {
     }
   }, [isAdmin]);
 
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.name.trim()) {
+      newErrors.name = "Book name is required";
+    }
+    if (!formData.authorId) {
+      newErrors.authorId = "Please select an author";
+    }
+    if (!formData.publisherId) {
+      newErrors.publisherId = "Please select a publisher";
+    }
+    if (!formData.src && !selectedFile) {
+      newErrors.image = "Please upload a book image";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     console.log("Form field changed:", name, value);
@@ -48,6 +71,11 @@ export default function DetailsGroup({ object, isAdmin, onUpdate }) {
       [name]:
         name === "authorId" || name === "publisherId" ? Number(value) : value,
     }));
+
+    // Clear error when field is modified
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: null }));
+    }
   };
 
   const handleImageClick = () => {
@@ -63,15 +91,22 @@ export default function DetailsGroup({ object, isAdmin, onUpdate }) {
       setSelectedFile(file);
       // Create a temporary URL for preview
       const previewUrl = URL.createObjectURL(file);
-      setFormData((prev) => ({
-        ...prev,
-        src: previewUrl,
-      }));
+      setFormData((prev) => ({ ...prev, src: previewUrl }));
+
+      // Clear image error if it exists
+      if (errors.image) {
+        setErrors((prev) => ({ ...prev, image: null }));
+      }
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
     setIsUploading(true);
     try {
       let imagePath = formData.src;
@@ -84,19 +119,26 @@ export default function DetailsGroup({ object, isAdmin, onUpdate }) {
         imagePath = uploadResponse.imagePath.replace("assets/", "");
       }
 
-      // Update book data with the new image path
-      const updatedBook = {
+      // Prepare book data
+      const bookData = {
         ...formData,
         src: imagePath,
         authorId: Number(formData.authorId),
         publisherId: Number(formData.publisherId),
       };
 
-      await updateBook(object.id, updatedBook);
-      console.log("Update successful, calling onUpdate");
-      if (onUpdate) onUpdate(updatedBook);
+      let result;
+      if (object.id) {
+        result = await updateBook(object.id, bookData);
+      } else {
+        result = await createBook(bookData);
+      }
+
+      console.log(`${mode === "edit" ? "Update" : "Create"} successful, calling onUpdate`);
+
+      if (onUpdate) onUpdate(result);
     } catch (error) {
-      console.error("Error updating book:", error);
+      console.error(`Error ${mode === "edit" ? "updating" : "creating"} book:`, error);
     } finally {
       setIsUploading(false);
     }
@@ -110,10 +152,15 @@ export default function DetailsGroup({ object, isAdmin, onUpdate }) {
           onClick={handleImageClick}
           style={{ cursor: isAdmin ? "pointer" : "default" }}
         >
-          <img src={formData.src} alt={formData.name} />
+          {formData.src ? (<img src={formData.src} alt={formData.name} />) : (
+            <div className="no-image">
+              <AddPhotoAlternateIcon style={{ fontSize: 48 }} />
+              <span>Click to upload image</span>
+            </div>
+          )}
           {isAdmin && (
             <div className="image-upload-overlay">
-              <span>Click to change image</span>
+              <span>Click to {formData.src ? "change" : "upload"} image</span>
             </div>
           )}
           <input
@@ -125,38 +172,57 @@ export default function DetailsGroup({ object, isAdmin, onUpdate }) {
           />
         </div>
         <form className="Detalies" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            placeholder="Book Name"
-          />
-          <select
-            name="authorId"
-            value={formData.authorId}
-            onChange={handleInputChange}
-          >
-            {authors.map((author) => (
-              <option key={author.id} value={author.id}>
-                {author.name}
-              </option>
-            ))}
-          </select>
-          <select
-            name="publisherId"
-            value={formData.publisherId}
-            onChange={handleInputChange}
-          >
-            {publishers.map((publisher) => (
-              <option key={publisher.id} value={publisher.id}>
-                {publisher.name}
-              </option>
-            ))}
-          </select>
+          <div className="form-group">
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              placeholder="Book Name"
+              className={errors.name ? "error" : ""}
+            />
+
+            {errors.name && (<span className="error-message">{errors.name}</span>)}
+          </div>
+
+          <div className="form-group">
+            <select
+              name="authorId"
+              value={formData.authorId}
+              onChange={handleInputChange}
+              className={errors.authorId ? "error" : ""}
+            >
+              {authors.map((author) => (
+                <option key={author.id} value={author.id}>
+                  {author.name}
+                </option>
+              ))}
+            </select>
+
+            {errors.authorId && (<span className="error-message">{errors.authorId}</span>)}
+          </div>
+
+          <div className="form-group">
+            <select
+              name="publisherId"
+              value={formData.publisherId}
+              onChange={handleInputChange}
+              className={errors.publisherId ? "error" : ""}
+            >
+              {publishers.map((publisher) => (
+                <option key={publisher.id} value={publisher.id}>
+                  {publisher.name}
+                </option>
+              ))}
+            </select>
+            {errors.publisherId && (<span className="error-message">{errors.publisherId}</span>)}
+          </div>
+
+          {errors.image && (<span className="error-message">{errors.image}</span>)}
+
           <div className="edit-actions">
             <button type="submit" disabled={isUploading}>
-              {isUploading ? "Saving..." : "Save"}
+              {isUploading ? "Saving..." : mode === "edit" ? "Save" : "Create"}
             </button>
             <button type="button" onClick={() => onUpdate && onUpdate()}>
               Cancel

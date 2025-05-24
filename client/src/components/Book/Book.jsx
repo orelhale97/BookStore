@@ -42,7 +42,7 @@ export default function Book({ book, key, user, onSelectBook, onBookDeleted, onE
          </div>
          <div className="book-details">
             <span className='name text-ellipsis-2'>{book.name}</span>
-            <span className='author'>{book.author.name}</span>
+            <span className='author'>{book?.author?.name || ""}</span>
          </div>
       </div>
    )

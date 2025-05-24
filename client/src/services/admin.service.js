@@ -43,5 +43,12 @@ export const uploadBookImage = async (file) => {
     return response.data;
 }
 
+export const createBook = async (bookData) => {
+    const headers = getHeaders();
+    
+    return axios.post(BOOKS_API, bookData, { headers })
+        .then((response) => generateObject(response.data));
+};
+
 
 

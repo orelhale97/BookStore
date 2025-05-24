@@ -116,7 +116,9 @@ export class BookController {
     }
 
 
-    return this.bookRepository.createIfNotExists(book, { name });
+    const newBook: Book = await this.bookRepository.createIfNotExists(book, { name });
+    const filter = new FilterBuilder<Book>().include(['author', 'publisher']).where({ id: newBook.id }).build();
+    return (this.bookRepository.findOne(filter) as Promise<Book>);
   }
 
 

@@ -1,84 +1,111 @@
-import Book from '../../components/Book/Book';
-import BookView from '../../components/BookView/BookView';
-import Search from '../../components/Search/Search';
-import { useAuth } from '../../context/AuthContext';
-import { fetchBooks } from '../../services/user.service';
-import { updateBook } from '../../services/admin.service';
-import DetailsGroup from '../../components/DetailsGroup/DetailsGroup';
-import './BooksPage.scss'
+import "./BooksPage.scss";
 
-import { useCallback, useEffect, useState } from 'react'
-import { SERVER_URL } from '../../services/api.service';
+import Book from "../../components/Book/Book";
+import BookView from "../../components/BookView/BookView";
+import Search from "../../components/Search/Search";
+import { useAuth } from "../../context/AuthContext";
+import { fetchBooks } from "../../services/user.service";
+import { updateBook } from "../../services/admin.service";
+import DetailsGroup from "../../components/DetailsGroup/DetailsGroup";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import { useCallback, useEffect, useState } from "react";
+import { SERVER_URL } from "../../services/api.service";
 
 export default function BooksPage() {
-   const { user, setShowPopup } = useAuth();
-   const [books, setBooks] = useState();
+  const { user, setShowPopup } = useAuth();
+  const [books, setBooks] = useState();
 
-   useEffect(() => {
-      searchBooks()
-   }, [])
+  useEffect(() => { searchBooks(); }, []);
 
-   function searchBooks(search) {
-      fetchBooks(search)
-         .then(setBooks)
-         .catch(err => console.error('Error loading books:', err));
-   }
+  const handleAddBook = () => {
+    setShowPopup(
+      <DetailsGroup
+        object={{}}
+        isAdmin={true}
+        onUpdate={handleCreateBook}
+        mode={"create"}
+      />
+    );
+  };
 
-   const onSelectBook = useCallback((book) => setShowPopup(<BookView book={book} />), []);
+  const handleCreateBook = (updatedBook) => {
+    const copyBooks = [...books];
+    copyBooks.push(updatedBook);
+    setBooks(copyBooks);
+    setShowPopup(null);
+  };
 
-   const handleBookDeleted = useCallback((deletedBookId) => {
-      setBooks(prevBooks => prevBooks.filter(book => book.id !== deletedBookId));
-   }, []);
+  function searchBooks(search) {
+    fetchBooks(search)
+      .then(setBooks)
+      .catch((err) => console.error("Error loading books:", err));
+  }
 
-   const handleEditBook = useCallback((book) => {
-      console.log('Opening edit popup for book:', book);
+
+  const onSelectBook = useCallback((book) => setShowPopup(<BookView book={book} />), []);
+
+
+  const handleBookDeleted = useCallback((deletedBookId) => {
+    setBooks((prevBooks) => prevBooks.filter((book) => book.id !== deletedBookId));
+  }, []);
+
+
+
+  const handleEditBook = useCallback(
+    (book) => {
+      console.log("Opening edit popup for book:", book);
       setShowPopup(
-         <DetailsGroup 
-            object={book} 
-            isAdmin={user?.role === 'admin'} 
-            onUpdate={async (updatedData) => {
-               console.log('Updating book with data:', updatedData);
-               try {
-                  const copyUpdatedData = {...updatedData};
-                  if (copyUpdatedData?.src) {
-                     copyUpdatedData.src = copyUpdatedData.src.replaceAll(SERVER_URL, "");
-                  }
-                  
-                  const updatedBook = await updateBook(book.id, copyUpdatedData);
-                  console.log('Book updated successfully:', updatedBook);
-                  setBooks(prevBooks => {
-                     const newBooks = [...prevBooks].map(b => b.id === book.id ? updatedBook : b);
-                     console.log('Updated books list:', newBooks);
-                     return newBooks;
-                  });
-                  setShowPopup(null);
-               } catch (error) {
-                  console.error('Error updating book:', error);
-               }
-            }}
-         />
-      );
-   }, [user?.role, setShowPopup]);
+        <DetailsGroup
+          object={book}
+          isAdmin={user?.role === "admin"}
+          onUpdate={async (updatedData) => {
+            console.log("Updating book with data:", updatedData);
+            try {
+              const copyUpdatedData = { ...updatedData };
 
-   return (
-      <div className='BoolList' key={"BoolList"}>
-         <Search searchHandler={searchBooks} title='Test Search'></Search>
+              if (copyUpdatedData?.src) { copyUpdatedData.src = copyUpdatedData.src.replaceAll(SERVER_URL, ""); }
+              if (copyUpdatedData.publisher) { delete copyUpdatedData.publisher; }
+              if (copyUpdatedData.author) { delete copyUpdatedData.author; }
 
-         <div className='booksContainer'>
-            {!books?.length
-               ? <p>No books found.</p>
-               : books.map((book, index) => (
-                  <Book 
-                     key={"book" + index} 
-                     book={book} 
-                     user={user} 
-                     onSelectBook={onSelectBook}
-                     onBookDeleted={handleBookDeleted}
-                     onEdit={handleEditBook}
-                  />
-               ))
+              const updatedBook = await updateBook(book.id, copyUpdatedData);
+              console.log("Book updated successfully:", updatedBook);
+
+              setBooks((prevBooks) => {
+                const newBooks = [...prevBooks].map((b) => b.id === book.id ? updatedBook : b);
+                console.log("Updated books list:", newBooks);
+                return newBooks;
+              });
+
+              setShowPopup(null);
+            } catch (error) {
+              console.error("Error updating book:", error);
             }
-         </div>
+          }}
+        />
+      );
+    },
+    [user?.role, setShowPopup]
+  );
+
+  return (
+    <div className="BoolList" key={"BoolList"}>
+      <Search searchHandler={searchBooks} title="Test Search"></Search>
+
+      <div className="booksContainer">
+        {!books?.length ?
+          (<p>No books found.</p>) :
+          (books.map((book, index) => (<Book
+            key={"book" + index}
+            book={book}
+            user={user}
+            onSelectBook={onSelectBook}
+            onBookDeleted={handleBookDeleted}
+            onEdit={handleEditBook}
+          />)))
+        }
       </div>
-   )
+
+      <button className="floating-action-button" onClick={handleAddBook} title="Add New Book"><AddCircleOutlineIcon /></button>
+    </div>
+  );
 }
