@@ -7,11 +7,8 @@ import './BooksPage.scss'
 
 import { useCallback, useEffect, useState } from 'react'
 
-
-
 export default function BooksPage() {
    const { user, setShowPopup } = useAuth();
-
    const [books, setBooks] = useState();
 
    useEffect(() => {
@@ -26,6 +23,9 @@ export default function BooksPage() {
 
    const onSelectBook = useCallback((book) => setShowPopup(<BookView book={book} />), []);
 
+   const handleBookDeleted = useCallback((deletedBookId) => {
+      setBooks(prevBooks => prevBooks.filter(book => book.id !== deletedBookId));
+   }, []);
 
    return (
       <div className='BoolList' key={"BoolList"}>
@@ -34,7 +34,15 @@ export default function BooksPage() {
          <div className='booksContainer'>
             {!books?.length
                ? <p>No books found.</p>
-               : books.map((book, index) => <Book key={"book" + index} book={book} user={user} onSelectBook={onSelectBook} />)
+               : books.map((book, index) => (
+                  <Book 
+                     key={"book" + index} 
+                     book={book} 
+                     user={user} 
+                     onSelectBook={onSelectBook}
+                     onBookDeleted={handleBookDeleted}
+                  />
+               ))
             }
          </div>
       </div>

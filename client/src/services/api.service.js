@@ -5,7 +5,7 @@ export const SERVER_URL = import.meta.env.VITE_API_SERVER;
 
 export function getHeaders() {
     const header = {};
-    if (localStorage.token) { header.Authorization = localStorage.token; }
+    if (localStorage.token) { header.Authorization = `Bearer ${localStorage.token}`; }
     return header
 }
 
