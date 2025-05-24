@@ -6,6 +6,8 @@ import Sidebar from '../Sidebar/Sidebar'
 import { Navigate, Route, Router, Routes } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import Popup from '../../components/Popup/Popup'
+import BooksPage from '../../pages/BooksPage/BooksPage'
+import PurchasesPage from '../../pages/PurchasesPage/PurchasesPage'
 
 
 export default function Layout() {
@@ -21,7 +23,8 @@ export default function Layout() {
             <div className='app-main'>
                <Routes>
                   <Route path="/" element={<Navigate to="/books" replace />} />
-                  <Route path="books" element={<Main />} />
+                  <Route path="books" element={<BooksPage />} />
+                  <Route path="history" element={<PurchasesPage />} />
                   <Route path="*" element={<h1 style={{ color: "red", textAlign: "center", marginTop: "200px" }}>Page not found</h1>} />
                </Routes>
             </div>

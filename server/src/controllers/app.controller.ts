@@ -1,10 +1,12 @@
-import { getModelSchemaRef, HttpErrors, post, requestBody } from "@loopback/rest";
+import { getModelSchemaRef, HttpErrors, post, requestBody, get } from "@loopback/rest";
 import { User } from "../models";
 import { UserRepository, RoleRepository } from "../repositories";
 import { repository } from "@loopback/repository";
 import { inject } from "@loopback/core";
 
 import { CustomAuthorizationBindings, JWTService } from "../utils/auto.service";
+import { authenticate } from "@loopback/authentication";
+import { authorize } from "@loopback/authorization";
 
 export class AppController {
   constructor(
@@ -77,6 +79,14 @@ export class AppController {
     return newUser
   }
 
+
+  @authenticate('jwt')
+  @authorize({ allowedRoles: ['admin', 'manager'] })
+  @get('/test')
+  test(): any {
+
+    return "test"
+  }
 }
 
 

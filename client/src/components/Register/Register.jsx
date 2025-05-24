@@ -1,11 +1,21 @@
 import './Register.scss'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { register } from '../../services/user.service';
 
 export default function Register({ onUserRegistered }) {
 
    const [form, setForm] = useState({ email: '', name: '', password: '' });
    const [error, setError] = useState('');
+
+
+   useEffect(() => {
+      const obj = {
+         email: `test@gmail.com`,
+         name: "test",
+         password: "1234"
+      }
+      setForm(obj)
+   }, [])
 
    const validate = () => {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

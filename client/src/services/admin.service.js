@@ -1,4 +1,6 @@
 
 import axios from "axios";
+import { SERVER_URL } from "./api.service";
 
-export const SERVER_URL = import.meta.env.VITE_API_SERVER;
+
+

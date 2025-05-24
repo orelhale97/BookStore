@@ -1,5 +1,5 @@
 import './LogIn.scss'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { login } from '../../services/user.service';
 
 
@@ -7,6 +7,16 @@ export default function LogIn({ onUserLoggedIn }) {
 
    const [form, setForm] = useState({ email: '', password: '' });
    const [error, setError] = useState('');
+
+
+   useEffect(() => {
+      const obj = {
+         email: `test@gmail.com`,
+         name: "test",
+         password: "1234"
+      }
+      setForm(obj)
+   }, [])
 
 
    async function handleSubmit(e) {

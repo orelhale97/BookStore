@@ -1,9 +1,10 @@
 import { inject, Getter } from '@loopback/core';
-import { DefaultCrudRepository, repository, BelongsToAccessor, Filter, DataObject, Where } from '@loopback/repository';
+import { DefaultCrudRepository, repository, BelongsToAccessor, Filter, DataObject, Where, HasManyRepositoryFactory } from '@loopback/repository';
 import { BookStoreDataSource } from '../datasources';
-import { User, UserRelations, Role } from '../models';
+import { User, UserRelations, Role, Purchases } from '../models';
 import { RoleRepository } from './role.repository';
 import { HttpErrors } from '@loopback/rest';
+import { PurchasesRepository } from './purchases.repository';
 
 export class UserRepository extends DefaultCrudRepository<
   User,
@@ -13,10 +14,16 @@ export class UserRepository extends DefaultCrudRepository<
 
   public readonly role: BelongsToAccessor<Role, typeof User.prototype.id>;
 
+  public readonly purchases: HasManyRepositoryFactory<Purchases, typeof User.prototype.id>;
+
   constructor(
-    @inject('datasources.bookStore') dataSource: BookStoreDataSource, @repository.getter('RoleRepository') protected roleRepositoryGetter: Getter<RoleRepository>,
+    @inject('datasources.bookStore') dataSource: BookStoreDataSource,
+    @repository.getter('RoleRepository') protected roleRepositoryGetter: Getter<RoleRepository>,
+    @repository.getter('PurchasesRepository') protected purchasesRepositoryGetter: Getter<PurchasesRepository>,
   ) {
     super(User, dataSource);
+    this.purchases = this.createHasManyRepositoryFactoryFor('purchases', purchasesRepositoryGetter,);
+    this.registerInclusionResolver('purchases', this.purchases.inclusionResolver);
     this.role = this.createBelongsToAccessorFor('role', roleRepositoryGetter,);
     this.registerInclusionResolver('role', this.role.inclusionResolver);
   }

@@ -1,6 +1,7 @@
-import { Entity, model, property, belongsTo } from '@loopback/repository';
+import { Entity, model, property, belongsTo, hasMany } from '@loopback/repository';
 import { Author } from './author.model';
 import { Publisher } from './publisher.model';
+import { Purchases } from './purchases.model';
 
 @model()
 export class Book extends Entity {
@@ -19,7 +20,7 @@ export class Book extends Entity {
 
   @property({
     type: 'string',
-    default: 1,
+    default: "",
   })
   description?: string;
 
@@ -46,6 +47,9 @@ export class Book extends Entity {
     type: 'string',
   })
   src: string;
+
+  @hasMany(() => Purchases)
+  purchases: Purchases[];
 
   constructor(data?: Partial<Book>) {
     super(data);

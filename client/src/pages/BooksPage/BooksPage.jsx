@@ -1,12 +1,17 @@
+import Book from '../../components/Book/Book';
+import BookView from '../../components/BookView/BookView';
 import Search from '../../components/Search/Search';
-import { fetchBooks, SERVER_URL } from '../../services/user.service';
+import { useAuth } from '../../context/AuthContext';
+import { fetchBooks } from '../../services/user.service';
 import './BooksPage.scss'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 
 
 export default function BooksPage() {
+   const { user, setShowPopup } = useAuth();
+
    const [books, setBooks] = useState();
 
    useEffect(() => {
@@ -19,25 +24,18 @@ export default function BooksPage() {
          .catch(err => console.error('Error loading books:', err));
    }
 
+   const onSelectBook = useCallback((book) => setShowPopup(<BookView book={book} />), []);
+
 
    return (
       <div className='BoolList' key={"BoolList"}>
          <Search searchHandler={searchBooks} title='Test Search'></Search>
 
          <div className='booksContainer'>
-            {books && books.map((book, index) =>
-               <div className='book' key={"book" + index}>
-
-                  <div className='img-wrap  logo-spin'>
-                     <img src={`${SERVER_URL}${book.src}`} />
-                  </div>
-
-                  <div className="book-details">
-                     <span className='name text-ellipsis-2'>{book.name}</span>
-                     <span className='author'>{book.author.name}</span>
-                  </div>
-               </div>
-            )}
+            {!books?.length
+               ? <p>No books found.</p>
+               : books.map((book, index) => <Book key={"book" + index} book={book} user={user} onSelectBook={onSelectBook} />)
+            }
          </div>
       </div>
    )

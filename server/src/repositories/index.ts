@@ -3,3 +3,4 @@ export * from './author.repository';
 export * from './publisher.repository';
 export * from './role.repository';
 export * from './user.repository';
+export * from './purchases.repository';

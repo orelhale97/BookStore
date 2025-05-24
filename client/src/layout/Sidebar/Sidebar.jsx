@@ -24,9 +24,9 @@ export default function Sidebar() {
 
    return (
       <div className="Sidebar">
-         {sidebarList.map(({ role, icon, content, path, onClick }) => (
+         {sidebarList.map(({ role, icon, content, path, onClick }, index) => (
             ((!role) || (role && user?.role && role.includes(user.role))) ? (
-               <button className={isActive(path)} onClick={() => onClick ? onClick() : navigate(path)}>
+               <button key={index + "sidebar"} className={isActive(path)} onClick={() => onClick ? onClick() : navigate(path)}>
                   {icon} {content}
                </button>
             ) : <></>

@@ -1,10 +1,11 @@
 import { inject, Getter } from '@loopback/core';
-import { DataObject, DefaultCrudRepository, Filter, repository, BelongsToAccessor, Where } from '@loopback/repository';
+import { DataObject, DefaultCrudRepository, Filter, repository, BelongsToAccessor, Where, HasManyRepositoryFactory} from '@loopback/repository';
 import { BookStoreDataSource } from '../datasources';
-import { Book, BookRelations, Author, Publisher } from '../models';
+import { Book, BookRelations, Author, Publisher, Purchases} from '../models';
 import { AuthorRepository } from './author.repository';
 import { PublisherRepository } from './publisher.repository';
 import { HttpErrors } from '@loopback/rest';
+import {PurchasesRepository} from './purchases.repository';
 
 export class BookRepository extends DefaultCrudRepository<
   Book,
@@ -16,12 +17,16 @@ export class BookRepository extends DefaultCrudRepository<
 
   public readonly publisher: BelongsToAccessor<Publisher, typeof Book.prototype.id>;
 
+  public readonly purchases: HasManyRepositoryFactory<Purchases, typeof Book.prototype.id>;
+
   constructor(
     @inject('datasources.bookStore') dataSource: BookStoreDataSource,
     @repository.getter('AuthorRepository') protected authorRepositoryGetter: Getter<AuthorRepository>,
-    @repository.getter('PublisherRepository') protected publisherRepositoryGetter: Getter<PublisherRepository>,
+    @repository.getter('PublisherRepository') protected publisherRepositoryGetter: Getter<PublisherRepository>, @repository.getter('PurchasesRepository') protected purchasesRepositoryGetter: Getter<PurchasesRepository>,
   ) {
     super(Book, dataSource);
+    this.purchases = this.createHasManyRepositoryFactoryFor('purchases', purchasesRepositoryGetter,);
+    this.registerInclusionResolver('purchases', this.purchases.inclusionResolver);
     this.publisher = this.createBelongsToAccessorFor('publisher', publisherRepositoryGetter,);
     this.registerInclusionResolver('publisher', this.publisher.inclusionResolver);
     this.author = this.createBelongsToAccessorFor('author', authorRepositoryGetter,);

@@ -22,7 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+*.tsbuildinfo
 
 /files
-/app-book-store
-*.tsbuildinfo

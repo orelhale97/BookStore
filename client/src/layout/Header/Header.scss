@@ -12,6 +12,7 @@
         font-size: 1.8rem;
         font-weight: bold;
         letter-spacing: 1px;
+        cursor: pointer;
     }
 
     .login-button {
@@ -25,5 +26,11 @@
         cursor: pointer;
         transition: background-color 0.3s, transform 0.2s;
         box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .user-name {
+        margin: unset;
+        padding: 5px;
+        // text-decoration: underline;
     }
 }

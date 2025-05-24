@@ -20,12 +20,18 @@ import {
 import { Publisher } from '../models';
 import { PublisherRepository } from '../repositories';
 
+import { authorize } from '@loopback/authorization';
+import { authenticate } from '@loopback/authentication';
+
+@authenticate('jwt')
 export class PublisherController {
   constructor(
     @repository(PublisherRepository)
     public publisherRepository: PublisherRepository,
   ) { }
 
+
+  @authorize({ allowedRoles: ['admin'] })
   @post('/publishers')
   @response(200, {
     description: 'Publisher model instance',
@@ -86,7 +92,7 @@ export class PublisherController {
     return this.publisherRepository.findById(id, filter);
   }
 
-
+  @authorize({ allowedRoles: ['admin'] })
   @put('/publishers/{id}')
   @response(204, {
     description: 'Publisher PUT success',
@@ -98,6 +104,7 @@ export class PublisherController {
     await this.publisherRepository.replaceById(id, publisher);
   }
 
+  @authorize({ allowedRoles: ['admin'] })
   @del('/publishers/{id}')
   @response(204, {
     description: 'Publisher DELETE success',

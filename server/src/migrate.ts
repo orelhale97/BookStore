@@ -97,7 +97,8 @@ async function creatingFakeBooks(app: BookStoreApplication) {
     console.log("New data =", { newAuthor, newPublisher });
 
     for (const book of books) {
-      const bookProperties = { name: book, authorId: newAuthor.id, publisherId: newPublisher.id, src: `${book}.jpg` };
+      const random = Math.ceil(Math.random() * 180) + 50;
+      const bookProperties = { name: book, authorId: newAuthor.id, publisherId: newPublisher.id, src: `${book}.jpg`, price: random };
       console.log("bookProperties = ", bookProperties);
 
       const newBook = await bookRepo.findOrCreate({ where: bookProperties }, bookProperties);

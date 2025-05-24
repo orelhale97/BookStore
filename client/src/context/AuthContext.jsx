@@ -40,6 +40,7 @@ export default function AuthProvider({ children }) {
             const isExpired = decoded.exp * 1000 < Date.now()
 
             isExpired ? logout() : setUser(decoded);
+            console.log("user =", decoded);
          } catch (error) {
             logout(error);
          }
