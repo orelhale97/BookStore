@@ -5,8 +5,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { buyBook } from '../../services/user.service';
 import { deleteBook } from '../../services/admin.service';
 
-export default function Book({ book, key, user, onSelectBook, onBookDeleted }) {
-
+export default function Book({ book, key, user, onSelectBook, onBookDeleted, onEdit }) {
    async function buyBookHandle(e) {
       e.stopPropagation();
       await buyBook(user.id, book.id)
@@ -22,13 +21,18 @@ export default function Book({ book, key, user, onSelectBook, onBookDeleted }) {
       }
    }
 
+   function editBookHandle(e) {
+      e.stopPropagation();
+      console.log('Edit clicked for book:', book);
+      if (onEdit) onEdit(book);
+   }
+
    return (
       <div className='Book' key={key} onClick={() => onSelectBook && onSelectBook(book)}>
-
          {user?.role && (
             <span className='warp-book-icon'>
                {user.role == "user" && <span className='book-icon' onClick={buyBookHandle}><AddShoppingCartIcon /></span>}
-               {user.role == "admin" && <span className='book-icon'><EditIcon /></span>}
+               {user.role == "admin" && <span className='book-icon' onClick={editBookHandle}><EditIcon /></span>}
                {user.role == "admin" && <span className='book-icon' onClick={deleteBookHandle}><DeleteIcon /></span>}
             </span>
          )}

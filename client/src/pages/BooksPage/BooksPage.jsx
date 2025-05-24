@@ -3,9 +3,12 @@ import BookView from '../../components/BookView/BookView';
 import Search from '../../components/Search/Search';
 import { useAuth } from '../../context/AuthContext';
 import { fetchBooks } from '../../services/user.service';
+import { updateBook } from '../../services/admin.service';
+import DetailsGroup from '../../components/DetailsGroup/DetailsGroup';
 import './BooksPage.scss'
 
 import { useCallback, useEffect, useState } from 'react'
+import { SERVER_URL } from '../../services/api.service';
 
 export default function BooksPage() {
    const { user, setShowPopup } = useAuth();
@@ -27,6 +30,36 @@ export default function BooksPage() {
       setBooks(prevBooks => prevBooks.filter(book => book.id !== deletedBookId));
    }, []);
 
+   const handleEditBook = useCallback((book) => {
+      console.log('Opening edit popup for book:', book);
+      setShowPopup(
+         <DetailsGroup 
+            object={book} 
+            isAdmin={user?.role === 'admin'} 
+            onUpdate={async (updatedData) => {
+               console.log('Updating book with data:', updatedData);
+               try {
+                  const copyUpdatedData = {...updatedData};
+                  if (copyUpdatedData?.src) {
+                     copyUpdatedData.src = copyUpdatedData.src.replaceAll(SERVER_URL, "");
+                  }
+                  
+                  const updatedBook = await updateBook(book.id, copyUpdatedData);
+                  console.log('Book updated successfully:', updatedBook);
+                  setBooks(prevBooks => {
+                     const newBooks = [...prevBooks].map(b => b.id === book.id ? updatedBook : b);
+                     console.log('Updated books list:', newBooks);
+                     return newBooks;
+                  });
+                  setShowPopup(null);
+               } catch (error) {
+                  console.error('Error updating book:', error);
+               }
+            }}
+         />
+      );
+   }, [user?.role, setShowPopup]);
+
    return (
       <div className='BoolList' key={"BoolList"}>
          <Search searchHandler={searchBooks} title='Test Search'></Search>
@@ -41,6 +74,7 @@ export default function BooksPage() {
                      user={user} 
                      onSelectBook={onSelectBook}
                      onBookDeleted={handleBookDeleted}
+                     onEdit={handleEditBook}
                   />
                ))
             }

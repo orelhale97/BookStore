@@ -21,6 +21,58 @@ import { Book } from '../models';
 import { AuthorRepository, BookRepository, PublisherRepository } from '../repositories';
 import { authorize } from '@loopback/authorization';
 import { authenticate } from '@loopback/authentication';
+import { Request, Response } from 'express';
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+
+// Configure multer for file upload
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadDir = path.join(__dirname, '../../assets/uploads');
+    // Create directory if it doesn't exist
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({
+  storage,
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type. Only JPEG, PNG and GIF are allowed.'));
+    }
+  },
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  }
+}).single('image');
+
+export const uploadImage = (req: Request, res: Response) => {
+  upload(req, res, (err) => {
+    if (err) {
+      console.error('Error uploading file:', err);
+      return res.status(400).json({ error: err.message });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    // Return the relative path to the uploaded file
+    const imagePath = `/assets/uploads/${req.file.filename}`;
+    res.json({ imagePath });
+  });
+};
 
 export class BookController {
   constructor(
@@ -146,8 +198,10 @@ export class BookController {
   async replaceById(
     @param.path.number('id') id: number,
     @requestBody() book: Book,
-  ): Promise<void> {
+  ): Promise<Book> {
     await this.bookRepository.replaceById(id, book);
+    const filter = new FilterBuilder<Book>().include(['author', 'publisher']).where({ id: id }).build();
+    return this.bookRepository.findById(id, filter);
   }
 
 
