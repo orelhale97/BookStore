@@ -1,0 +1,48 @@
+.PublisherPage {
+
+    padding: 16px;
+
+    .list {
+        list-style: none;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .card {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 1rem;
+        background-color: #f9f9f9;
+        justify-content: space-between;
+
+        .wrap-mui-icon {
+            display: flex;
+            gap: 15px;
+
+            .mui-icon {
+                cursor: pointer;
+                border: 1px solid #757575;
+                display: flex;
+                width: 35px;
+                height: 35px;
+                font-size: 14px;
+                justify-content: center;
+                align-items: center;
+                border-radius: 50%;
+                color: #757575;
+                background: rgb(220, 219, 219);
+                opacity: 0.7;
+
+                &:hover {
+                    opacity: 0.9 !important;
+                }
+            }
+        }
+    }
+
+}

@@ -1,7 +1,6 @@
 import {
-  Count,
-  CountSchema,
   Filter,
+  FilterBuilder,
   FilterExcludingWhere,
   repository,
   Where,
@@ -22,7 +21,6 @@ import { authorize } from '@loopback/authorization';
 import { authenticate } from '@loopback/authentication';
 
 
-@authenticate('jwt')
 export class AuthorController {
 
   constructor(
@@ -30,7 +28,7 @@ export class AuthorController {
     public authorRepository: AuthorRepository,
   ) { }
 
-
+  @authenticate('jwt')
   @authorize({ allowedRoles: ['admin'] })
   @post('/authors')
   @response(200, {
@@ -90,7 +88,8 @@ export class AuthorController {
     return this.authorRepository.findById(id, filter);
   }
 
-
+  
+  @authenticate('jwt')
   @authorize({ allowedRoles: ['admin'] })
   @put('/authors/{id}')
   @response(204, {
@@ -99,11 +98,15 @@ export class AuthorController {
   async replaceById(
     @param.path.number('id') id: number,
     @requestBody() author: Author,
-  ): Promise<void> {
+  ): Promise<Author> {
+
     await this.authorRepository.replaceById(id, author);
+    const filter = new FilterBuilder<Author>().where({ id: id }).build();
+    return this.authorRepository.findById(id, filter);
   }
 
 
+  @authenticate('jwt')
   @authorize({ allowedRoles: ['admin'] })
   @del('/authors/{id}')
   @response(204, {
@@ -113,24 +116,4 @@ export class AuthorController {
     await this.authorRepository.deleteById(id);
   }
 
-
-
-  // @get('/authors/{id}/books', {
-  //   responses: {
-  //     '200': {
-  //       description: 'Array of Author has many Book',
-  //       content: {
-  //         'application/json': {
-  //           schema: {type: 'array', items: getModelSchemaRef(Book)},
-  //         },
-  //       },
-  //     },
-  //   },
-  // })
-  // async find(
-  //   @param.path.number('id') id: number,
-  //   @param.query.object('filter') filter?: Filter<Book>,
-  // ): Promise<Book[]> {
-  //   return this.authorRepository.books(id).find(filter);
-  // }
 }

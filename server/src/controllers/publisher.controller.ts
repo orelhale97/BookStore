@@ -2,6 +2,7 @@ import {
   Count,
   CountSchema,
   Filter,
+  FilterBuilder,
   FilterExcludingWhere,
   repository,
   Where,
@@ -23,14 +24,14 @@ import { PublisherRepository } from '../repositories';
 import { authorize } from '@loopback/authorization';
 import { authenticate } from '@loopback/authentication';
 
-@authenticate('jwt')
+
 export class PublisherController {
   constructor(
     @repository(PublisherRepository)
     public publisherRepository: PublisherRepository,
   ) { }
 
-
+  @authenticate('jwt')
   @authorize({ allowedRoles: ['admin'] })
   @post('/publishers')
   @response(200, {
@@ -92,6 +93,7 @@ export class PublisherController {
     return this.publisherRepository.findById(id, filter);
   }
 
+  @authenticate('jwt')
   @authorize({ allowedRoles: ['admin'] })
   @put('/publishers/{id}')
   @response(204, {
@@ -100,10 +102,13 @@ export class PublisherController {
   async replaceById(
     @param.path.number('id') id: number,
     @requestBody() publisher: Publisher,
-  ): Promise<void> {
-    await this.publisherRepository.replaceById(id, publisher);
+  ): Promise<Publisher> {
+    await this.publisherRepository.replaceById(id, publisher);;
+    const filter = new FilterBuilder<Publisher>().where({ id: id }).build();
+    return this.publisherRepository.findById(id, filter);
   }
 
+  @authenticate('jwt')
   @authorize({ allowedRoles: ['admin'] })
   @del('/publishers/{id}')
   @response(204, {
@@ -112,25 +117,4 @@ export class PublisherController {
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.publisherRepository.deleteById(id);
   }
-
-
-
-  // @get('/publishers/{id}/books', {
-  //   responses: {
-  //     '200': {
-  //       description: 'Array of Publisher has many Book',
-  //       content: {
-  //         'application/json': {
-  //           schema: {type: 'array', items: getModelSchemaRef(Book)},
-  //         },
-  //       },
-  //     },
-  //   },
-  // })
-  // async find(
-  //   @param.path.number('id') id: number,
-  //   @param.query.object('filter') filter?: Filter<Book>,
-  // ): Promise<Book[]> {
-  //   return this.publisherRepository.books(id).find(filter);
-  // }
 }
