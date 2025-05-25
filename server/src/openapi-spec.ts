@@ -7,7 +7,7 @@ import {BookStoreApplication} from './application';
 async function exportOpenApiSpec(): Promise<void> {
   const config: ApplicationConfig = {
     rest: {
-      port: +(process.env.PORT ?? 3000),
+      port: +(process.env.SERVER_PORT ?? 3000),
       host: process.env.HOST ?? 'localhost',
     },
   };
