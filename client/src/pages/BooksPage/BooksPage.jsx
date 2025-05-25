@@ -3,7 +3,7 @@ import "./BooksPage.scss";
 import Book from "../../components/Book/Book";
 import BookView from "../../components/BookView/BookView";
 import Search from "../../components/Search/Search";
-import { useAuth } from "../../context/AuthContext";
+import { useAppContext } from "../../context/AppContext";
 import { fetchBooks } from "../../services/user.service";
 import { updateBook } from "../../services/admin.service";
 import DetailsGroup from "../../components/DetailsGroup/DetailsGroup";
@@ -12,7 +12,7 @@ import { useCallback, useEffect, useState } from "react";
 import { SERVER_URL } from "../../services/api.service";
 
 export default function BooksPage() {
-  const { user, setShowPopup } = useAuth();
+  const { user, setShowPopup } = useAppContext();
   const [books, setBooks] = useState();
 
   useEffect(() => { searchBooks(); }, []);
@@ -24,6 +24,7 @@ export default function BooksPage() {
         isAdmin={true}
         onUpdate={handleCreateBook}
         mode={"create"}
+        onClose={setShowPopup}
       />
     );
   };
@@ -58,6 +59,7 @@ export default function BooksPage() {
         <DetailsGroup
           object={book}
           isAdmin={user?.role === "admin"}
+          onClose={setShowPopup}
           onUpdate={async (updatedData) => {
             console.log("Updating book with data:", updatedData);
             try {
@@ -88,7 +90,7 @@ export default function BooksPage() {
   );
 
   return (
-    <div className="BoolList" key={"BoolList"}>
+    <div className="BoolList">
       <Search searchHandler={searchBooks} title="Test Search"></Search>
 
       <div className="booksContainer">
@@ -105,7 +107,7 @@ export default function BooksPage() {
         }
       </div>
 
-      <button className="floating-action-button" onClick={handleAddBook} title="Add New Book"><AddCircleOutlineIcon /></button>
+      {user?.role == "admin" && <button className="floating-action-button" onClick={handleAddBook} title="Add New Book"><AddCircleOutlineIcon /></button>}
     </div>
   );
 }
