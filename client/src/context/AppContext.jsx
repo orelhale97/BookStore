@@ -3,17 +3,16 @@ import { jwtDecode } from "jwt-decode"
 import { useNavigate } from 'react-router-dom';
 
 
-const AuthContext = createContext();
+const AppContext = createContext();
+export const useAppContext = () => useContext(AppContext);
 
 
-export const useAuth = () => useContext(AuthContext);
+export default function AppProvider({ children }) {
 
-
-export default function AuthProvider({ children }) {
-
+   const navigate = useNavigate();
+   
    const [user, setUser] = useState(null);
    const [showPopup, setShowPopup] = useState(null);
-   const navigate = useNavigate();
 
    useEffect(() => {
       getUserDetailsFromToken()
@@ -27,7 +26,6 @@ export default function AuthProvider({ children }) {
 
       localStorage.removeItem("token");
       setUser(null);
-
       navigate("/")
    };
 
@@ -56,11 +54,8 @@ export default function AuthProvider({ children }) {
 
 
    return (
-      <AuthContext.Provider value={{ setToken, logout, user, showPopup, setShowPopup }}>
+      <AppContext.Provider value={{ setToken, logout, user, showPopup, setShowPopup }}>
          {children}
-      </AuthContext.Provider>
+      </AppContext.Provider>
    )
-
 }
-
-

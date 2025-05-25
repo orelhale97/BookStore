@@ -1,10 +1,10 @@
-import { useAuth } from '../../context/AuthContext';
+import { useAppContext } from '../../context/AppContext';
 import './Sidebar.scss'
 import { useLocation, useNavigate } from 'react-router-dom';
 
 
 export default function Sidebar() {
-   const { user, logout } = useAuth();
+   const { user, logout } = useAppContext();
    const location = useLocation();
    const navigate = useNavigate();
 

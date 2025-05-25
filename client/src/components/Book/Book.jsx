@@ -6,9 +6,11 @@ import { buyBook } from '../../services/user.service';
 import { deleteBook } from '../../services/admin.service';
 
 export default function Book({ book, key, user, onSelectBook, onBookDeleted, onEdit }) {
+
    async function buyBookHandle(e) {
       e.stopPropagation();
-      await buyBook(user.id, book.id)
+      await buyBook(user.id, book.id);
+      alert("Success")
    }
 
    async function deleteBookHandle(e) {
@@ -31,9 +33,9 @@ export default function Book({ book, key, user, onSelectBook, onBookDeleted, onE
       <div className='Book' key={key} onClick={() => onSelectBook && onSelectBook(book)}>
          {user?.role && (
             <span className='warp-book-icon'>
-               {user.role == "user" && <span className='book-icon' onClick={buyBookHandle}><AddShoppingCartIcon /></span>}
-               {user.role == "admin" && <span className='book-icon' onClick={editBookHandle}><EditIcon /></span>}
-               {user.role == "admin" && <span className='book-icon' onClick={deleteBookHandle}><DeleteIcon /></span>}
+               {user.role == "user" && <span className='mui-icon' onClick={buyBookHandle}><AddShoppingCartIcon /></span>}
+               {user.role == "admin" && <span className='mui-icon' onClick={editBookHandle}><EditIcon /></span>}
+               {user.role == "admin" && <span className='mui-icon' onClick={deleteBookHandle}><DeleteIcon /></span>}
             </span>
          )}
 

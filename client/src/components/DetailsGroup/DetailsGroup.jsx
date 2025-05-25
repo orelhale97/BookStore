@@ -10,13 +10,17 @@ import {
 
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 
-export default function DetailsGroup({ object, isAdmin, onUpdate, mode = "edit", }) {
+export default function DetailsGroup({ object, isAdmin, onUpdate, onClose, mode = "edit", }) {
+  
+  
   const [formData, setFormData] = useState({
     name: "",
     authorId: "",
     publisherId: "",
     src: "",
   });
+  
+  
   const [authors, setAuthors] = useState([]);
   const [publishers, setPublishers] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
@@ -65,12 +69,8 @@ export default function DetailsGroup({ object, isAdmin, onUpdate, mode = "edit",
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    console.log("Form field changed:", name, value);
-    setFormData((prev) => ({
-      ...prev,
-      [name]:
-        name === "authorId" || name === "publisherId" ? Number(value) : value,
-    }));
+
+    setFormData((prev) => ({ ...prev, [name]: value }));
 
     // Clear error when field is modified
     if (errors[name]) {
@@ -182,7 +182,7 @@ export default function DetailsGroup({ object, isAdmin, onUpdate, mode = "edit",
               className={errors.name ? "error" : ""}
             />
 
-            {errors.name && (<span className="error-message">{errors.name}</span>)}
+            {errors.name && (<span className="text-error">{errors.name}</span>)}
           </div>
 
           <div className="form-group">
@@ -199,7 +199,7 @@ export default function DetailsGroup({ object, isAdmin, onUpdate, mode = "edit",
               ))}
             </select>
 
-            {errors.authorId && (<span className="error-message">{errors.authorId}</span>)}
+            {errors.authorId && (<span className="text-error">{errors.authorId}</span>)}
           </div>
 
           <div className="form-group">
@@ -215,16 +215,16 @@ export default function DetailsGroup({ object, isAdmin, onUpdate, mode = "edit",
                 </option>
               ))}
             </select>
-            {errors.publisherId && (<span className="error-message">{errors.publisherId}</span>)}
+            {errors.publisherId && (<span className="text-error">{errors.publisherId}</span>)}
           </div>
 
-          {errors.image && (<span className="error-message">{errors.image}</span>)}
+          {errors.image && (<span className="text-error">{errors.image}</span>)}
 
           <div className="edit-actions">
             <button type="submit" disabled={isUploading}>
               {isUploading ? "Saving..." : mode === "edit" ? "Save" : "Create"}
             </button>
-            <button type="button" onClick={() => onUpdate && onUpdate()}>
+            <button type="button" onClick={() => onClose && onClose()}>
               Cancel
             </button>
           </div>
